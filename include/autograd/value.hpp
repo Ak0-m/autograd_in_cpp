@@ -3,22 +3,23 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
+
 namespace ag
 {
 
-class Value
+class Value : public std::enable_shared_from_this<Value>
 {
     double value_;
     double grad_ = 0;
     std::vector<std::shared_ptr<Value>> prev_;
     std::string oper_;
-
-    static void build_topo(const std::shared_ptr<Value> &node, std::vector<std::shared_ptr<Value>> &out,
-                           std::unordered_set<Value *> &visited);
+    static void build_topo(const std::shared_ptr<Value> &node, std::set<Value*> &visited, std::vector<std::shared_ptr<Value>> &topo);
+    static std::vector<std::shared_ptr<Value>> build_topo(const std::shared_ptr<Value> &node);
 
   public:
     explicit Value(double value);
@@ -32,7 +33,7 @@ class Value
     {
         return grad_;
     }
-    std::vector<std::shared_ptr<Value>> prev() const
+    std::vector<std::shared_ptr<Value>> &prev()
     {
         return prev_;
     }
@@ -45,6 +46,7 @@ class Value
     {
         grad_ = grad;
     }
+
     void zero_grad();
     void backward();
 
