@@ -13,7 +13,7 @@ Value::Value(double value, std::vector<std::shared_ptr<Value>> prev, std::string
 {
 }
 
-void Value::build_topo(const std::shared_ptr<Value> &node, std::set<Value *> &visited,
+void Value::build_topo(const std::shared_ptr<Value> &node, std::unordered_set<Value *> &visited,
                        std::vector<std::shared_ptr<Value>> &topo)
 {
     if (visited.contains(node.get()))
@@ -34,7 +34,7 @@ void Value::build_topo(const std::shared_ptr<Value> &node, std::set<Value *> &vi
 std::vector<std::shared_ptr<Value>> Value::build_topo(const std::shared_ptr<Value> &node)
 {
     std::vector<std::shared_ptr<Value>> topo;
-    std::set<Value *> visited;
+    std::unordered_set<Value *> visited;
     build_topo(node, visited, topo);
     return topo;
 }

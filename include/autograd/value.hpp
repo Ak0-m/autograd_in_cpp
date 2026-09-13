@@ -3,7 +3,6 @@
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <set>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -18,7 +17,7 @@ class Value : public std::enable_shared_from_this<Value>
     double grad_ = 0;
     std::vector<std::shared_ptr<Value>> prev_;
     std::string oper_;
-    static void build_topo(const std::shared_ptr<Value> &node, std::set<Value*> &visited, std::vector<std::shared_ptr<Value>> &topo);
+    static void build_topo(const std::shared_ptr<Value> &node, std::unordered_set<Value*> &visited, std::vector<std::shared_ptr<Value>> &topo);
     static std::vector<std::shared_ptr<Value>> build_topo(const std::shared_ptr<Value> &node);
 
   public:
@@ -33,7 +32,7 @@ class Value : public std::enable_shared_from_this<Value>
     {
         return grad_;
     }
-    std::vector<std::shared_ptr<Value>> &prev()
+    const std::vector<std::shared_ptr<Value>> &prev() const
     {
         return prev_;
     }
