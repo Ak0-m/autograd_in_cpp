@@ -59,7 +59,13 @@ class Tensor : public std::enable_shared_from_this<Tensor>
         return oper_;
     }
 
-    void add_grad(const std::vector<double> &g);
+    void add_grad(const std::vector<double> &g)
+    {
+        if (g.size() != grads_.size())
+            throw std::runtime_error("add_grad: size mismatch");
+        for (size_t i = 0; i < grads_.size(); ++i)
+            grads_[i] += g[i];
+    }
     void zero_grad();
     void backward();
 
@@ -70,6 +76,9 @@ inline std::shared_ptr<Tensor> scalar_like(const std::shared_ptr<Tensor> &t, dou
 {
     return std::make_shared<Tensor>(std::vector<double>(t->values().size(), v), t->shape());
 }
+
+std::shared_ptr<Tensor> sum(const std::shared_ptr<Tensor> &x);
+std::shared_ptr<Tensor> mean(const std::shared_ptr<Tensor> &x);
 
 std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, const std::shared_ptr<Tensor> &rhs);
 inline std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, double rhs)
@@ -90,4 +99,4 @@ inline std::shared_ptr<Tensor> operator*(double lhs, const std::shared_ptr<Tenso
     return scalar_like(rhs, lhs) * rhs;
 }
 
-}
+} // namespace ag
