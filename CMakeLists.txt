@@ -14,7 +14,7 @@ endif()
 
 add_library(ag STATIC
     src/value.cpp
-    # src/tensor.cpp    <-- UNCOMMENT THIS IN WEEK 2
+    src/tensor.cpp
 )
 
 target_include_directories(ag
