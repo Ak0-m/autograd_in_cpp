@@ -71,6 +71,33 @@ class Tensor : public std::enable_shared_from_this<Tensor>
 
     void zero_grad();
     void backward();
-    
+
+    std::shared_ptr<Tensor> transpose(size_t d1, size_t d2) ;
+    std::shared_ptr<Tensor> transpose() ;
 };
+
+namespace detail
+{
+inline std::vector<size_t> compute_strides(const std::vector<size_t> &shape)
+{
+    std::vector<size_t> strides(shape.size());
+    size_t s = 1;
+
+    if (shape.empty())
+        return {};
+
+    for (size_t i = shape.size() - 1; true; --i)
+    {
+        strides[i] = s;
+        s *= shape[i];
+
+        if (i == 0)
+        {
+            break;
+        }
+    }
+    return strides;
+}
+} // namespace detail
+
 } // namespace ag

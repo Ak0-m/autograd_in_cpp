@@ -33,4 +33,5 @@ inline std::shared_ptr<Tensor> operator*(double lhs, const std::shared_ptr<Tenso
     return scalar_like(rhs, lhs) * rhs;
 }
 
+std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::shared_ptr<Tensor> &rhs);
 } // namespace ag

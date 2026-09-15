@@ -6,40 +6,16 @@
 namespace ag
 {
 
-namespace
-{
-static std::vector<size_t> compute_strides(const std::vector<size_t> &shape)
-{
-    std::vector<size_t> strides(shape.size());
-    size_t s = 1;
-
-    if (shape.empty())
-        return {};
-
-    for (size_t i = shape.size() - 1; true; --i)
-    {
-        strides[i] = s;
-        s *= shape[i];
-
-        if (i == 0)
-        {
-            break;
-        }
-    }
-    return strides;
-}
-}
-
 Tensor::Tensor(std::vector<double> values, std::vector<size_t> shape)
     : values_(std::move(values)), grads_(values_.size(), 0.0), shape_(std::move(shape)),
-      strides_(compute_strides(shape)), oper_("leaf")
+      strides_(detail::compute_strides(shape_)), oper_("leaf")
 {
 }
 
 Tensor::Tensor(std::vector<double> values, std::vector<std::shared_ptr<Tensor>> prev, std::string oper,
                std::vector<size_t> shape)
     : values_(std::move(values)), grads_(values_.size(), 0.0), shape_(std::move(shape)),
-      strides_(compute_strides(shape_)), prev_(std::move(prev)), oper_(std::move(oper))
+      strides_(detail::compute_strides(shape_)), prev_(std::move(prev)), oper_(std::move(oper))
 {
 }
 
@@ -98,6 +74,5 @@ void Tensor::zero_grad()
         std::fill(node->grads_.begin(), node->grads_.end(), 0.0);
     }
 }
-
 
 } // namespace ag
