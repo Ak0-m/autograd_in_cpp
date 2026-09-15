@@ -30,6 +30,8 @@ class Tensor : public std::enable_shared_from_this<Tensor>
     Tensor(std::vector<double> values, std::vector<std::shared_ptr<Tensor>> prev, std::string oper,
            std::vector<size_t> shape);
 
+    std::function<void()> backward_func;
+
     const std::vector<double> &values() const
     {
         return values_;
@@ -66,37 +68,9 @@ class Tensor : public std::enable_shared_from_this<Tensor>
         for (size_t i = 0; i < grads_.size(); ++i)
             grads_[i] += g[i];
     }
+
     void zero_grad();
     void backward();
-
-    std::function<void()> backward_func;
+    
 };
-
-inline std::shared_ptr<Tensor> scalar_like(const std::shared_ptr<Tensor> &t, double v)
-{
-    return std::make_shared<Tensor>(std::vector<double>(t->values().size(), v), t->shape());
-}
-
-std::shared_ptr<Tensor> sum(const std::shared_ptr<Tensor> &x);
-std::shared_ptr<Tensor> mean(const std::shared_ptr<Tensor> &x);
-
-std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, const std::shared_ptr<Tensor> &rhs);
-inline std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, double rhs)
-{
-    return lhs + scalar_like(lhs, rhs);
-}
-inline std::shared_ptr<Tensor> operator+(double lhs, const std::shared_ptr<Tensor> &rhs)
-{
-    return scalar_like(rhs, lhs) + rhs;
-}
-std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std::shared_ptr<Tensor> &rhs);
-inline std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, double rhs)
-{
-    return lhs * scalar_like(lhs, rhs);
-}
-inline std::shared_ptr<Tensor> operator*(double lhs, const std::shared_ptr<Tensor> &rhs)
-{
-    return scalar_like(rhs, lhs) * rhs;
-}
-
 } // namespace ag
