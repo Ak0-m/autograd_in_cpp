@@ -18,6 +18,7 @@ add_library(ag STATIC
     src/tensor/tensor/transpose.cpp
     src/tensor/ops/reductions.cpp
     src/tensor/ops/elementwise.cpp
+    src/tensor/ops/matops.cpp
 )
 
 target_include_directories(ag

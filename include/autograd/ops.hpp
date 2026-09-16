@@ -23,6 +23,15 @@ inline std::shared_ptr<Tensor> operator+(double lhs, const std::shared_ptr<Tenso
 {
     return scalar_like(rhs, lhs) + rhs;
 }
+std::shared_ptr<Tensor> operator-(const std::shared_ptr<Tensor> &lhs, const std::shared_ptr<Tensor> &rhs);
+inline std::shared_ptr<Tensor> operator-(const std::shared_ptr<Tensor> &lhs, double rhs)
+{
+    return lhs - scalar_like(lhs, rhs);
+}
+inline std::shared_ptr<Tensor> operator-(double lhs, const std::shared_ptr<Tensor> &rhs)
+{
+    return scalar_like(rhs, lhs) - rhs;
+}
 std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std::shared_ptr<Tensor> &rhs);
 inline std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, double rhs)
 {
