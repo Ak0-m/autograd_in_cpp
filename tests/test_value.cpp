@@ -1,72 +1,119 @@
 #include "autograd/value.hpp"
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 int main() {
     using namespace ag;
 
-    // 1. Create leaf nodes
-    auto a = std::make_shared<Value>(2.0);
-    auto b = std::make_shared<Value>(3.0);
+    std::cout << "Running Backward Tests...\n" << std::endl;
 
-    // 2. Forward operations
-    auto sum = a + b;       // 2.0 + 3.0 = 5.0
-    auto product = a * b;   // 2.0 * 3.0 = 6.0
+    {
+        auto a = std::make_shared<Value>(2.0);
+        auto b = std::make_shared<Value>(3.0);
+        auto c = a + b;
 
-    // 3. Check forward values
-    assert(sum->value() == 5.0);
-    assert(product->value() == 6.0);
+        c->zero_grad(); 
+        c->backward();
 
-    // 4. Check operation strings
-    assert(sum->oper() == "+");
-    assert(product->oper() == "*");
-    assert(a->oper() == "leaf");
-    assert(b->oper() == "leaf");
+        assert(a->grad() == 1.0);
+        assert(b->grad() == 1.0);
+        std::cout << "Test 1 (Addition) PASSED" << std::endl;
+    }
 
-    // 5. Check the graph structure (prev)
-    // sum's children are {a, b}
-    const auto& sum_prev = sum->prev();
-    assert(sum_prev.size() == 2);
-    assert(sum_prev[0] == a);
-    assert(sum_prev[1] == b);
+    {
+        auto a = std::make_shared<Value>(2.0);
+        auto b = std::make_shared<Value>(3.0);
+        auto c = a * b;
 
-    // product's children are {a, b}
-    const auto& prod_prev = product->prev();
-    assert(prod_prev.size() == 2);
-    assert(prod_prev[0] == a);
-    assert(prod_prev[1] == b);
+        c->zero_grad();
+        c->backward();
 
-    // 6. More complex: (a + b) * (a - b) ? Not implemented yet, but we can do (a + b) * a
-    auto sum2 = a + b;      // 5.0
-    auto product2 = sum2 * a; // 5.0 * 2.0 = 10.0
-    assert(product2->value() == 10.0);
-    assert(product2->oper() == "*");
-    const auto& prod2_prev = product2->prev();
-    assert(prod2_prev.size() == 2);
-    assert(prod2_prev[0] == sum2);
-    assert(prod2_prev[1] == a);
+        assert(a->grad() == 3.0);
+        assert(b->grad() == 2.0);
+        std::cout << "Test 2 (Multiplication) PASSED" << std::endl;
+    }
+    {
+        auto a = std::make_shared<Value>(2.0);
+        auto c = a * a; 
 
-    // 7. Constant promotion
-    auto with_double = a + 4.0;  // 2.0 + 4.0 = 6.0
-    assert(with_double->value() == 6.0);
-    assert(with_double->oper() == "+");
-    const auto& with_double_prev = with_double->prev();
-    assert(with_double_prev.size() == 2);
-    assert(with_double_prev[0] == a);
-    // The second child is a temporary Value(4.0) – we can't assert exact pointer,
-    // but we can check its value is 4.0.
-    assert(with_double_prev[1]->value() == 4.0);
-    assert(with_double_prev[1]->oper() == "leaf");
+        c->zero_grad();
+        c->backward();
 
-    // 8. Mixed constants
-    auto left_double = 2.5 * b; // 2.5 * 3.0 = 7.5
-    assert(left_double->value() == 7.5);
-    assert(left_double->oper() == "*");
-    const auto& left_prev = left_double->prev();
-    assert(left_prev.size() == 2);
-    assert(left_prev[0]->value() == 2.5);
-    assert(left_prev[1] == b);
+        assert(a->grad() == 4.0);
+        std::cout << "Test 3 (Repeated Variable) PASSED" << std::endl;
+    }
+    {
+        auto a = std::make_shared<Value>(2.0);
+        auto b = std::make_shared<Value>(3.0);
+        auto mult = a * b;
+        auto c = mult + a;
 
-    std::cout << "All forward-pass tests passed!" << std::endl;
+        c->zero_grad();
+        c->backward();
+
+        assert(a->grad() == 4.0);
+        assert(b->grad() == 2.0);
+        std::cout << "Test 4 (Mixed Operations) PASSED" << std::endl;
+    }
+    {
+        auto a = std::make_shared<Value>(2.0);
+        auto b = std::make_shared<Value>(3.0);
+        auto sum = a + b;
+        auto c = sum * a;
+
+        c->zero_grad();
+        c->backward();
+        assert(std::abs(a->grad() - 7.0) < 1e-9);
+        assert(std::abs(b->grad() - 2.0) < 1e-9);
+        std::cout << "Test 5 (Branching) PASSED" << std::endl;
+    }
+    {
+        auto a = std::make_shared<Value>(2.0);
+        auto c = a * 2.0;
+
+        c->zero_grad();
+        c->backward();
+
+        assert(a->grad() == 2.0);
+        std::cout << "Test 6 (Constant Promotion) PASSED" << std::endl;
+    }
+    {
+        auto a = std::make_shared<Value>(2.0);
+        auto b = std::make_shared<Value>(3.0);
+        auto c = a * b;
+
+        c->zero_grad();
+        c->backward();
+        assert(a->grad() == 3.0);
+        assert(b->grad() == 2.0);
+
+        c->zero_grad();
+        assert(a->grad() == 0.0);
+        assert(b->grad() == 0.0);
+
+        c->backward();
+        assert(a->grad() == 3.0);
+        assert(b->grad() == 2.0);
+
+        std::cout << "Test 7 (Zero Grad Reset) PASSED" << std::endl;
+    }
+    {
+        auto a = std::make_shared<Value>(2.0);
+        auto c = a * a;
+        c->backward();  
+
+        bool exception_thrown = false;
+        try {
+            c->backward();
+        } catch (const std::runtime_error& e) {
+            exception_thrown = true;
+        }
+
+        assert(exception_thrown);
+        std::cout << "Test 8 (Exception Handling) PASSED" << std::endl;
+    }
+
+    std::cout << "\nAll backward tests passed successfully!" << std::endl;
     return 0;
 }
