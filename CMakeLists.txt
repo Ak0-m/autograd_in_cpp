@@ -28,7 +28,6 @@ target_include_directories(ag
 )
 target_compile_features(ag PUBLIC cxx_std_23)
 
-# ---- Option: Build tests ----
 option(BUILD_TESTS "Build the unit tests" ON)
 
 if(BUILD_TESTS)
@@ -36,7 +35,6 @@ if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-# ---- Option: Build examples (Week 3) ----
 option(BUILD_EXAMPLES "Build the example programs" OFF)
 
 if(BUILD_EXAMPLES)
