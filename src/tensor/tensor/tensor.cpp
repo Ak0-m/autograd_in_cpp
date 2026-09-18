@@ -75,4 +75,20 @@ void Tensor::zero_grad()
     }
 }
 
+void Tensor::SGD_step(double lr)
+{
+    for(size_t i = 0; i < values_.size(); ++i)
+    {
+        values_[i] -= lr * grads_[i];
+    }
+}
+
+void Tensor::SGD_step_for_scalar(double lr, double g)
+{
+    for(size_t i = 0; i < values_.size(); ++i)
+    {
+        values_[i] -= lr * g;
+    }
+}
+
 } // namespace ag

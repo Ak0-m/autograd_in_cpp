@@ -28,14 +28,14 @@ target_include_directories(ag
 )
 target_compile_features(ag PUBLIC cxx_std_23)
 
-option(BUILD_TESTS "Build the unit tests" ON)
+option(BUILD_TESTS "Build the unit tests" OFF)
 
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
 
-option(BUILD_EXAMPLES "Build the example programs" OFF)
+option(BUILD_EXAMPLES "Build the example programs" ON)
 
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
