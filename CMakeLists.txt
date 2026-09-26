@@ -28,7 +28,7 @@ target_include_directories(ag
 )
 target_compile_features(ag PUBLIC cxx_std_23)
 
-option(BUILD_TESTS "Build the unit tests" OFF)
+option(BUILD_TESTS "Build the unit tests" ON)
 
 if(BUILD_TESTS)
     enable_testing()
