@@ -52,8 +52,8 @@ std::shared_ptr<Tensor> Tensor::transpose(size_t d1, size_t d2)
     auto out = std::make_shared<Tensor>(std::move(out_values), std::vector<std::shared_ptr<Tensor>>{self}, "transpose",
                                         nshape);
 
-    out->backward_func = [self, d1, d2, out]() {
-        auto grad = std::make_shared<Tensor>(out->grads(), out->shape());
+    out->backward_func = [self, d1, d2](Tensor &out) {
+        auto grad = std::make_shared<Tensor>(out.grads(), out.shape());
         self->add_grad(grad->transpose(d1, d2)->values());
     };
 

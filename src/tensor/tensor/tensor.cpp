@@ -61,7 +61,7 @@ void Tensor::backward()
     {
         if (node->backward_func)
         {
-            node->backward_func();
+            node->backward_func(*node);
         }
     }
 }

@@ -31,7 +31,7 @@ class Tensor : public std::enable_shared_from_this<Tensor>
     Tensor(std::vector<double> values, std::vector<std::shared_ptr<Tensor>> prev, std::string oper,
            std::vector<size_t> shape);
 
-    std::function<void()> backward_func;
+    std::function<void(Tensor&)> backward_func;
 
     const std::vector<double> &values() const
     {

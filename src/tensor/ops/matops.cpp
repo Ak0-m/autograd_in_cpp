@@ -161,7 +161,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
 
     auto out = std::make_shared<Tensor>(std::move(out_values), std::move(prev), "@", out_shape);
 
-    out->backward_func = [lhs, rhs, out, m, n, k1, out_batch, total_batch, out_shape, out_strides, as, bs]() {
+    out->backward_func = [lhs, rhs, m, n, k1, out_batch, total_batch, out_shape, out_strides, as, bs](Tensor &out) {
         std::vector<double> lhs_contrib(lhs->values().size(), 0.0);
         std::vector<double> rhs_contrib(rhs->values().size(), 0.0);
 
@@ -187,7 +187,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
                     double acc = 0.0;
                     for (size_t j = 0; j < n; ++j)
                     {
-                        double g = out->grads()[c_offset + i * c_rs + j * c_cs];
+                        double g = out.grads()[c_offset + i * c_rs + j * c_cs];
                         double b_val = rhs->values()[b_offset + k * b_rs + j * b_cs];
                         acc += g * b_val;
                     }
@@ -203,7 +203,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
                     for (size_t i = 0; i < m; ++i)
                     {
                         double av = lhs->values()[a_offset + i * a_rs + k * a_cs];
-                        double g = out->grads()[c_offset + i * c_rs + j * c_cs];
+                        double g = out.grads()[c_offset + i * c_rs + j * c_cs];
                         acc += av * g;
                     }
                     rhs_contrib[b_offset + k * b_rs + j * b_cs] += acc;
