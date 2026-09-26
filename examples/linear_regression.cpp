@@ -46,7 +46,7 @@ int main()
         auto diff = pred - Y;
         auto loss = mean(diff * diff);
 
-        if(l1 == loss->values()[0])
+        if (l1 == loss->values()[0])
         {
             break;
         }
@@ -79,4 +79,6 @@ int main()
     for (size_t j = 0; j < F; ++j)
         std::cout << "  w[" << j << "] = " << W->values()[j] << "   (true " << true_ws[j] << ")\n";
     std::cout << "  b    = " << b->values()[0] << "   (true " << true_b << ")\n";
+
+    return 0;
 }
