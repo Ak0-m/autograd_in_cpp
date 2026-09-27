@@ -13,7 +13,7 @@ that are abstracted away by frameworks like PyTorch
 - **operators:** '+', '-', '*', 'matmul', 'sum', 'mean', 'transpose'(contiguous)
 - **Broadcasting** built only for matmul and in matmul
 - **Gradient accumulation** for variables used multiple times in the graph.
-- **Manual SGD** via ```Tensor::sgd_step(lr)``` and ```Tensor::SGD_step_for_scalar(lr, g)```
+- **Gradient Descent** via ```Tensor::GD_step(lr)``` and ```Tensor::GD_step_for_scalar(lr, g)```
 - **Built-in tests** for every operations both for bith Tensor and Value clases
 
 ## Example models

@@ -59,7 +59,7 @@ int main()
         b->zero_grad();
         loss->backward();
 
-        W->SGD_step(lr);
+        W->GD_step(lr);
 
         double g = 0.0;
         for (size_t i = 0; i < N; ++i)
@@ -67,7 +67,7 @@ int main()
             g += b->grads()[i];
         }
 
-        b->SGD_step_for_scalar(lr, g);
+        b->GD_step_for_scalar(lr, g);
 
         if (e % 200 == 0)
         {

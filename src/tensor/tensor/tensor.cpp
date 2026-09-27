@@ -75,7 +75,7 @@ void Tensor::zero_grad()
     }
 }
 
-void Tensor::SGD_step(double lr)
+void Tensor::GD_step(double lr)
 {
     for(size_t i = 0; i < values_.size(); ++i)
     {
@@ -83,7 +83,7 @@ void Tensor::SGD_step(double lr)
     }
 }
 
-void Tensor::SGD_step_for_scalar(double lr, double g)
+void Tensor::GD_step_for_scalar(double lr, double g)
 {
     for(size_t i = 0; i < values_.size(); ++i)
     {

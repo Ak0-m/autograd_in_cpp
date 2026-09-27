@@ -76,8 +76,8 @@ class Tensor : public std::enable_shared_from_this<Tensor>
     std::shared_ptr<Tensor> transpose(size_t d1, size_t d2) ;
     std::shared_ptr<Tensor> transpose() ;
 
-    void SGD_step(double lr);
-    void SGD_step_for_scalar(double lr, double g);
+    void GD_step(double lr);
+    void GD_step_for_scalar(double lr, double g);
 };
 
 namespace detail
