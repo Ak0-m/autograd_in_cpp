@@ -17,7 +17,8 @@ that are abstracted away by frameworks like PyTorch
 - **Built-in tests** for every operations both for bith Tensor and Value clases
 
 ## Example models
-- **Linear Regression** on synthetic data (multi-feature)
+- **Linear Regression**
+- **Logistic Regression**
 
 ## Build
 Requires CMake >= 3.15 and C++-20 capable compiler
