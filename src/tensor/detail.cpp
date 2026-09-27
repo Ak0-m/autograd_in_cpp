@@ -66,11 +66,14 @@ std::vector<size_t> broadcast(std::vector<size_t> a, std::vector<size_t> b)
 
 std::vector<size_t> unravel(size_t flat, const std::vector<size_t> &shape)
 {
+    if (shape.empty()) return {};
+
     std::vector<size_t> idx(shape.size());
-    for (size_t i = 0; i < shape.size(); ++i)
+    for (size_t i = shape.size() - 1; true; --i)
     {
         idx[i] = flat % shape[i];
         flat /= shape[i];
+        if (i == 0) break;
     }
     return idx;
 }

@@ -4,4 +4,5 @@
 namespace ag
 {
     std::shared_ptr<Tensor> MSE_loss(std::shared_ptr<Tensor> targets, std::shared_ptr<Tensor> preds);
+    std::shared_ptr<Tensor> cross_entropy_loss(std::shared_ptr<Tensor> targets, std::shared_ptr<Tensor> preds);
 } 
