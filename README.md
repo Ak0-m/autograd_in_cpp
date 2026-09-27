@@ -1,19 +1,23 @@
 # Autograd in C++ - A Minimal Autograd Engine
 
 A from scratch automatic differentiation engine in c++
-Built to understand how production ready libraries like PyTorch work
+Built to understand how production frameworks like PyTorch work
+
+## Why I made this
+I made it as a way to learn the basics of Machine learning
+that are abstracted away by frameworks like PyTorch
 
 ## What it has
-- **N-dimensional tensors** with shape, strides and contiguous buffer.
+- **N-dimensional tensors** with shape, strides and a flat contiguous buffer.
 - **Reverse-mode autodiff** through a dynamically built computation graph
 - **operators:** '+', '-', '*', 'matmul', 'sum', 'mean', 'transpose'(contiguous)
-- **Broadcasting** built only for matmul
+- **Broadcasting** built only for matmul and in matmul
 - **Gradient accumulation** for variables used multiple times in the graph.
-- **Manual SGD** via ```void SGD_step(double lr)``` and ```SGD_step_for_scalar(double lr, double g)```
-- **Built-in tests** for all the operations both tensor and Value
+- **Manual SGD** via ```Tensor::sgd_step(lr)``` and ```Tensor::SGD_step_for_scalar(lr, g)```
+- **Built-in tests** for every operations both for bith Tensor and Value clases
 
 ## Example models
-- **Linear Regression on synthetic data (multi-feature)**
+- **Linear Regression** on synthetic data (multi-feature)
 
 ## Build
 Requires CMake >= 3.15 and C++-20 capable compiler
