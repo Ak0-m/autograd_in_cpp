@@ -82,26 +82,13 @@ class Tensor : public std::enable_shared_from_this<Tensor>
 
 namespace detail
 {
-inline std::vector<size_t> compute_strides(const std::vector<size_t> &shape)
-{
-    std::vector<size_t> strides(shape.size());
-    size_t s = 1;
+std::vector<size_t> compute_strides(const std::vector<size_t> &shape);
 
-    if (shape.empty())
-        return {};
+std::vector<size_t> broadcast(std::vector<size_t> a, std::vector<size_t> b);
+std::vector<size_t> unravel(size_t flat, const std::vector<size_t>& shape);
 
-    for (size_t i = shape.size() - 1; true; --i)
-    {
-        strides[i] = s;
-        s *= shape[i];
-
-        if (i == 0)
-        {
-            break;
-        }
-    }
-    return strides;
-}
+std::vector<size_t> new_stride(std::vector<size_t> shape, std::vector<size_t> stride, std::vector<size_t> broad_shape);
+std::vector<double> reduce_to_shape(std::vector<double> broad_grad, std::vector<size_t> broad_shape, std::vector<size_t> stride, std::vector<size_t> shape);
 } // namespace detail
 
 } // namespace ag

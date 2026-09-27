@@ -2,56 +2,6 @@
 
 namespace ag
 {
-
-static std::vector<size_t> broadcast(std::vector<size_t> a, std::vector<size_t> b)
-{
-    std::vector<size_t> out(std::max(a.size(), b.size()));
-
-    size_t ai;
-    size_t bi;
-
-    for (size_t i = 0; i < out.size(); ++i)
-    {
-        if (i < out.size() - a.size())
-        {
-            ai = 1;
-        }
-        else
-        {
-            ai = a[i - (out.size() - a.size())];
-        }
-        if (i < out.size() - b.size())
-        {
-            bi = 1;
-        }
-        else
-        {
-            bi = b[i - (out.size() - b.size())];
-        }
-
-        if (ai == bi || ai == 1 || bi == 1)
-        {
-            out[i] = std::max(ai, bi);
-        }
-        else
-        {
-            throw std::runtime_error("matmul: batch dims not broadcastable");
-        }
-    }
-    return out;
-}
-
-static std::vector<size_t> unravel(size_t flat, const std::vector<size_t>& shape)
-{
-    std::vector<size_t> idx(shape.size());
-    for (size_t i = 0; i < shape.size(); ++i)
-    {
-        idx[i] = flat % shape[i];
-        flat  /= shape[i];
-    }
-    return idx;
-}
-
 static size_t compute_offset(const std::vector<size_t> &shape, const std::vector<size_t> &strides,
                              const std::vector<size_t> &batchi)
 {
@@ -98,7 +48,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
 
     std::vector<size_t> a_batch(as.begin(), as.end() - 2);
     std::vector<size_t> b_batch(bs.begin(), bs.end() - 2);
-    std::vector<size_t> out_batch = broadcast(a_batch, b_batch);
+    std::vector<size_t> out_batch = detail::broadcast(a_batch, b_batch);
 
     std::vector<size_t> out_shape = out_batch;
     out_shape.push_back(m);
@@ -130,7 +80,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
 
     for (size_t d = 0; d < total_batch; ++d)
     {
-        std::vector<size_t> out_idx = unravel(d, out_batch);
+        std::vector<size_t> out_idx = detail::unravel(d, out_batch);
 
         size_t a_offset = compute_offset(lhs->shape(), lhs->strides(), out_idx);
         size_t b_offset = compute_offset(rhs->shape(), rhs->strides(), out_idx);
@@ -167,7 +117,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
 
         for (size_t d = 0; d < total_batch; ++d)
         {
-            std::vector<size_t> out_idx = unravel(d, out_batch);
+            std::vector<size_t> out_idx = detail::unravel(d, out_batch);
 
             size_t a_offset = compute_offset(as, lhs->strides(), out_idx);
             size_t b_offset = compute_offset(bs, rhs->strides(), out_idx);

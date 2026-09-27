@@ -1,5 +1,6 @@
 #include "autograd/ops.hpp"
 #include "autograd/tensor.hpp"
+#include "autograd/loss_funcs.hpp"
 
 #include <iostream>
 #include <random>
@@ -43,8 +44,7 @@ int main()
     for (size_t e = 0; e < EPOCH; ++e)
     {
         auto pred = matmul(X, W) + b;
-        auto diff = pred - Y;
-        auto loss = mean(diff * diff);
+        auto loss = MSE_loss(Y, pred);
 
         if (l1 == loss->values()[0])
         {
