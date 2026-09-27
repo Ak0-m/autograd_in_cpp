@@ -11,7 +11,7 @@ that are abstracted away by frameworks like PyTorch
 - **N-dimensional tensors** with shape, strides and a flat contiguous buffer.
 - **Reverse-mode autodiff** through a dynamically built computation graph
 - **operators:** '+', '-', '*', 'matmul', 'sum', 'mean', 'transpose'(contiguous)
-- **Broadcasting** built only for matmul and in matmul
+- **Broadcasting** for matmul and elementwise operations
 - **Gradient accumulation** for variables used multiple times in the graph.
 - **Gradient Descent** via ```Tensor::GD_step(lr)``` and ```Tensor::GD_step_for_scalar(lr, g)```
 - **Built-in tests** for every operations both for bith Tensor and Value clases
