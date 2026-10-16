@@ -9,9 +9,12 @@ std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, const std:
     {
         std::vector<double> out_values(lhs->values().size());
 
+        const double *l_data = lhs->values().data();
+        const double *r_data = rhs->values().data();
+        
         for (size_t i = 0; i < out_values.size(); ++i)
         {
-            out_values[i] = lhs->values()[i] + rhs->values()[i];
+            out_values[i] = l_data[i] + r_data[i];
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
@@ -24,7 +27,7 @@ std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, const std:
         };
         return out;
 
-    /**/ }
+    }
     else
     {
         auto broad_shape = detail::broadcast(lhs->shape(), rhs->shape());
@@ -39,6 +42,9 @@ std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, const std:
         }
 
         std::vector<double> broad_values(total);
+        const double *l_data = lhs->values().data();
+        const double *r_data = rhs->values().data();
+
 
         for (size_t i = 0; i < total; ++i)
         {
@@ -52,7 +58,7 @@ std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, const std:
                 b_off += idx[j] * rhs_stride[j];
             }
 
-            broad_values[i] = lhs->values()[a_off] + rhs->values()[b_off];
+            broad_values[i] = l_data[a_off] + r_data[b_off];
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
@@ -73,10 +79,13 @@ std::shared_ptr<Tensor> operator-(const std::shared_ptr<Tensor> &lhs, const std:
     if (lhs->shape() == rhs->shape())
     {
         std::vector<double> out_values(lhs->values().size());
+        
+        const double *l_data = lhs->values().data();
+        const double *r_data = rhs->values().data();
 
         for (size_t i = 0; i < out_values.size(); ++i)
         {
-            out_values[i] = lhs->values()[i] - rhs->values()[i];
+            out_values[i] = l_data[i] - r_data[i];
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
@@ -87,9 +96,11 @@ std::shared_ptr<Tensor> operator-(const std::shared_ptr<Tensor> &lhs, const std:
             lhs->add_grad(out.grads());
 
             std::vector<double> neg(out.grads().size());
+            const double *o_grads = out.grads().data();
+            
             for (size_t i = 0; i < neg.size(); ++i)
             {
-                neg[i] = -out.grads()[i];
+                neg[i] = -o_grads[i];
             }
             rhs->add_grad(neg);
         };
@@ -110,6 +121,8 @@ std::shared_ptr<Tensor> operator-(const std::shared_ptr<Tensor> &lhs, const std:
         }
 
         std::vector<double> broad_values(total);
+        const double *l_data = lhs->values().data();
+        const double *r_data = rhs->values().data();
 
         for (size_t i = 0; i < total; ++i)
         {
@@ -123,7 +136,7 @@ std::shared_ptr<Tensor> operator-(const std::shared_ptr<Tensor> &lhs, const std:
                 b_off += idx[j] * rhs_stride[j];
             }
 
-            broad_values[i] = lhs->values()[a_off] - rhs->values()[b_off];
+            broad_values[i] = l_data[a_off] - r_data[b_off];
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
@@ -149,10 +162,12 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
     if (lhs->shape() == rhs->shape())
     {
         std::vector<double> out_values(lhs->values().size());
+        const double *l_data = lhs->values().data();
+        const double *r_data = rhs->values().data();
 
         for (size_t i = 0; i < out_values.size(); ++i)
         {
-            out_values[i] = lhs->values()[i] * rhs->values()[i];
+            out_values[i] = l_data[i] * r_data[i];
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
@@ -161,14 +176,19 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
 
         out->backward_func = [lhs, rhs](Tensor &out) {
             std::vector<double> contrib(out.values().size());
+
+            const double *l_data = lhs->values().data();
+            const double *r_data = rhs->values().data();
+            const double *out_grads = out.grads().data();
+            
             for (size_t i = 0; i < contrib.size(); ++i)
             {
-                contrib[i] = out.grads()[i] * rhs->values()[i];
+                contrib[i] = out_grads[i] * r_data[i];
             }
             lhs->add_grad(contrib);
             for (size_t i = 0; i < contrib.size(); ++i)
             {
-                contrib[i] = out.grads()[i] * lhs->values()[i];
+                contrib[i] = out_grads[i] * l_data[i];
             }
             rhs->add_grad(contrib);
         };
@@ -189,6 +209,8 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
         }
 
         std::vector<double> broad_values(total);
+        const double *l_data = lhs->values().data();
+        const double *r_data = rhs->values().data();
 
         for (size_t i = 0; i < total; ++i)
         {
@@ -202,7 +224,7 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
                 b_off += idx[j] * rhs_stride[j];
             }
 
-            broad_values[i] = lhs->values()[a_off] * rhs->values()[b_off];
+            broad_values[i] = l_data[a_off] * r_data[b_off];
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
@@ -217,6 +239,10 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
 
             std::vector<double> tmp(total);
 
+            const double *l_data = lhs->values().data();
+            const double *r_data = rhs->values().data();
+            const double *out_grads = out.grads().data();
+
             for (size_t i = 0; i < total; ++i)
             {
                 auto idx = detail::unravel(i, broad_shape);
@@ -228,7 +254,7 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
                     b_off += idx[j] * rhs_stride[j];
                 }
 
-                tmp[i] = out.grads()[i] * rhs->values()[b_off];
+                tmp[i] = out_grads[i] * r_data[b_off];
             }
             auto lg = detail::reduce_to_shape(tmp, out.shape(), lhs->strides(), lhs->shape());
 
@@ -243,7 +269,7 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
                     a_off += idx[j] * lhs_stride[j];
                 }
 
-                tmp[i] = out.grads()[i] * lhs->values()[a_off];
+                tmp[i] = out_grads[i] * l_data[a_off];
             }
             auto rg = detail::reduce_to_shape(tmp, out.shape(), rhs->strides(), rhs->shape());
 
