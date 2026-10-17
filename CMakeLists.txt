@@ -42,3 +42,6 @@ option(BUILD_EXAMPLES "Build the example programs" ON)
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+target_compile_options(ag PRIVATE -fopenmp -march=native -O3)
+target_link_options(ag PUBLIC -fopenmp)

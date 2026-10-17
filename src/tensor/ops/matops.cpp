@@ -93,6 +93,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
         size_t c_rs = out_strides[out_shape.size() - 2];
         size_t c_cs = out_strides[out_shape.size() - 1];
 
+#pragma omp parallel for
         for (size_t i = 0; i < m; ++i)
         {
             for (size_t k = 0; k < k1; ++k)
@@ -130,6 +131,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
             size_t c_rs = out_strides[out_shape.size() - 2];
             size_t c_cs = out_strides[out_shape.size() - 1];
 
+#pragma omp parallel for
             for (size_t i = 0; i < m; ++i)
             {
                 for (size_t k = 0; k < k1; ++k)
@@ -145,6 +147,7 @@ std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor> &lhs, const std::sh
                 }
             }
 
+#pragma omp parallel for
             for (size_t k = 0; k < k1; ++k)
             {
                 for (size_t j = 0; j < n; ++j)

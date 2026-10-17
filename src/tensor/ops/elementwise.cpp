@@ -62,7 +62,7 @@ std::shared_ptr<Tensor> operator+(const std::shared_ptr<Tensor> &lhs, const std:
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
-        auto out = std::make_shared<Tensor>(std::move(broad_values), prev, "+", broad_shape);
+        auto out = std::make_shared<Tensor>(std::move(broad_values), std::move(prev), "+", broad_shape);
 
         out->backward_func = [lhs, rhs](Tensor &out) {
             auto lg = detail::reduce_to_shape(out.grads(), out.shape(), lhs->strides(), lhs->shape());
@@ -140,7 +140,7 @@ std::shared_ptr<Tensor> operator-(const std::shared_ptr<Tensor> &lhs, const std:
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
-        auto out = std::make_shared<Tensor>(std::move(broad_values), prev, "-", broad_shape);
+        auto out = std::make_shared<Tensor>(std::move(broad_values), std::move(prev), "-", broad_shape);
 
         out->backward_func = [lhs, rhs](Tensor &out) {
             auto lg = detail::reduce_to_shape(out.grads(), out.shape(), lhs->strides(), lhs->shape());
@@ -228,7 +228,7 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
         }
 
         std::vector<std::shared_ptr<Tensor>> prev = {lhs, rhs};
-        auto out = std::make_shared<Tensor>(std::move(broad_values), prev, "*", broad_shape);
+        auto out = std::make_shared<Tensor>(std::move(broad_values), std::move(prev), "*", broad_shape);
 
         out->backward_func = [lhs, rhs, broad_shape, lhs_stride, rhs_stride](Tensor &out) {
             size_t total = 1;
@@ -279,4 +279,32 @@ std::shared_ptr<Tensor> operator*(const std::shared_ptr<Tensor> &lhs, const std:
         return out;
     }
 }
+
+std::shared_ptr<Tensor> relu(const std::shared_ptr<Tensor> &x)
+{
+    std::vector<double> out_values(x->values().size());
+    const double *x_data = x->values().data();
+    
+    for (size_t i = 0; i < x->values().size(); ++i)
+    {
+        out_values[i] = std::max(0.0, x_data[i]);
+    }
+
+    std::vector<std::shared_ptr<Tensor>> prev = {x};
+    auto out = std::make_shared<Tensor>(std::move(out_values), std::move(prev), "relu", x->shape());
+
+    out->backward_func = [x](Tensor &out) {
+        std::vector<double> g(x->values().size());
+        const double *x_data = x->values().data();
+
+        for (size_t i = 0; i < g.size(); ++i)
+        {
+            g[i] = out.grads()[i] * (x_data[i] > 0.0 ? 1.0 : 0.0);
+        }
+        
+        x->add_grad(g);
+    };       
+
+return out;        
+}    
 } // namespace ag
